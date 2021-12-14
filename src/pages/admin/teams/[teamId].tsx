@@ -6,6 +6,7 @@ import { Meal, Team } from '../../../types';
 import { useState } from 'react';
 import { MealEditor } from '../../../components/MealEditor';
 import Link from 'next/link';
+import { useSession } from '../../../hooks/useSession';
 
 const fetchTeam = async (entity: string, teamId: number) => {
   const { data } = await supabase.from<Team>('teams').select('*').eq('id', teamId).single();
@@ -18,6 +19,7 @@ const fetchMeals = async (entity: string, teamId: number) => {
 };
 
 const Admin: NextPage = () => {
+  const session = useSession();
   const { query } = useRouter();
   const { data: team } = useSWR(query.teamId ? ['teams', query.teamId] : null, fetchTeam, { revalidateOnFocus: false });
   const { data: meals, mutate } = useSWR(query.teamId ? ['meals', query.teamId] : null, fetchMeals, {
@@ -36,6 +38,8 @@ const Admin: NextPage = () => {
       setAddingMeal(false);
     }
   };
+
+  if (!(session?.user?.email === 'sergiomensing@gmail.com')) return null;
 
   if (!team || meals === undefined) return null;
 

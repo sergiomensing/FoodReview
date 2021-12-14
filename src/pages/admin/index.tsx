@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import Link from 'next/link';
 import { Team, Setting } from '../../types';
 import { SettingRow } from '../../components/SettingRow';
+import { useSession } from '../../hooks/useSession';
 
 const fetchTeams = async (entity: string) => {
   const { data } = await supabase.from<Team>('teams').select('*');
@@ -27,6 +28,7 @@ const updateSetting = async (setting: Setting): Promise<Setting> => {
 };
 
 const Admin: NextPage = () => {
+  const session = useSession();
   const { data: teams } = useSWR(['teams'], fetchTeams, { revalidateOnFocus: false });
   const { data: settings, mutate } = useSWR(['settings'], fetchSettings, { revalidateOnFocus: false });
 
@@ -38,6 +40,8 @@ const Admin: NextPage = () => {
     );
     return Boolean(data);
   };
+
+  if (!(session?.user?.email === 'sergiomensing@gmail.com')) return null;
 
   return (
     <div className="p-8">
