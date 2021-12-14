@@ -58,7 +58,7 @@ const Admin: NextPage = () => {
             const { publicURL } = supabase.storage.from('meals').getPublicUrl(meal.image_url);
             return (
               <div className="bg-background-light shadow-lg w-full rounded-xl" key={meal.id}>
-                <img className="rounded-t-xl" src={publicURL} alt="test" />
+                <img className="rounded-t-xl" src={publicURL || ''} alt="test" />
                 <div className="p-4">
                   <h2 className="flex items-center justify-between">
                     <span>{meal.name}</span>
