@@ -1,11 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
-import { ActiveMeal, useActiveMeal } from '../hooks/useActiveMeal';
+import { useEffect, useState } from 'react';
+import { useActiveMeal } from '../hooks/useActiveMeal';
 import { useReviewSteps, RatingCategory } from '../hooks/useReviewSteps';
 import { PageIndicator } from './PageIndicator';
 import { ReviewStepCheck } from './ReviewStepCheck';
 import { ReviewStepFinished } from './ReviewStepFinished';
+import { ReviewStepName } from './ReviewStepName';
 import { ReviewStepRating } from './ReviewStepRating';
 import { ReviewStepReview } from './ReviewStepReview';
 
@@ -27,9 +28,23 @@ const buttonLabels = {
 export const ReviewSteps = () => {
   const router = useRouter();
   const { activeMeal, loading } = useActiveMeal();
+  const [isIntro, setIsIntro] = useState(true);
 
-  const { addRating, currentStep, nextStep, review, setReview, index, steps, done, submitReview, rating, submitted } =
-    useReviewSteps(activeMeal?.id);
+  const {
+    addRating,
+    currentStep,
+    nextStep,
+    review,
+    setReview,
+    index,
+    steps,
+    done,
+    submitReview,
+    rating,
+    submitted,
+    name,
+    setName,
+  } = useReviewSteps(activeMeal?.id);
 
   const onRatingStepSubmit = (category: RatingCategory, rating: number) => {
     addRating(category, rating);
@@ -61,9 +76,43 @@ export const ReviewSteps = () => {
           </>
         )}
       </div>
+      <AnimatePresence>
+        {isIntro && (
+          <motion.div
+            className="h-full w-full absolute pt-20"
+            initial={{ transform: 'translateX(0)' }}
+            animate={{ transform: 'translateX(0%)' }}
+            exit={{ transform: 'translateX(-120%)' }}
+            transition={{ type: 'tween', duration: 0.5, ease: 'easeInOut' }}
+          >
+            <div className="p-8 mt-24 flex flex-col h-full text-center  items-center">
+              <h1 className="font-semibold text-2xl">Breng je stem uit voor {activeMeal.team.name}</h1>
+              <button
+                onClick={() => setIsIntro(false)}
+                className="mt-4 bg-primary text-white font-medium whitespace-nowrap px-8 py-3 rounded-lg text-center disabled:bg-background-light disabled:text-opacity-10 hover:scale-105 transition-transform duration-150 ease-in-out disabled:pointer-events-none"
+              >
+                Let’s go!
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {!name && !isIntro && (
+          <motion.div
+            className="h-full w-full absolute pt-20"
+            initial={{ transform: 'translateX(120%)' }}
+            animate={{ transform: 'translateX(0%)' }}
+            exit={{ transform: 'translateX(-120%)' }}
+            transition={{ type: 'tween', duration: 0.5, ease: 'easeInOut' }}
+          >
+            <ReviewStepName onSubmit={setName} />
+          </motion.div>
+        )}
+      </AnimatePresence>
       {categories.map((category, index) => (
         <AnimatePresence key={category}>
-          {currentStep.type === 'rating' && currentStep.category === category && (
+          {currentStep.type === 'rating' && currentStep.category === category && name && (
             <motion.div
               className="h-full w-full absolute pt-20"
               initial={{ transform: 'translateX(120%)' }}

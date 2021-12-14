@@ -52,6 +52,7 @@ export const useReviewSteps = (mealId: number | undefined) => {
   const [index, setIndex] = useState(0);
   const [ratings, setRatings] = useState<ReviewRating[]>([]);
   const [review, setReview] = useState('');
+  const [name, setName] = useState('');
   const [done, setDone] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -65,7 +66,13 @@ export const useReviewSteps = (mealId: number | undefined) => {
 
       const { data } = await supabase
         .from('reviews')
-        .insert({ user_id: session.user.id, name: 'test', overall_rating: rating, review: review, meal_id: mealId })
+        .insert({
+          user_id: session.user.id,
+          name: name || 'Anoniem',
+          overall_rating: rating,
+          review: review,
+          meal_id: mealId,
+        })
         .single();
 
       await supabase.from('review_ratings').insert(
@@ -135,5 +142,7 @@ export const useReviewSteps = (mealId: number | undefined) => {
     submitReview,
     rating,
     submitted,
+    name,
+    setName,
   };
 };
