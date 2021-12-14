@@ -89,7 +89,7 @@ export const ReviewSteps = () => {
               <h1 className="font-semibold text-2xl">Breng je stem uit voor {activeMeal.team.name}</h1>
               <button
                 onClick={() => setIsIntro(false)}
-                className="mt-4 bg-primary text-white font-medium whitespace-nowrap px-8 py-3 rounded-lg text-center disabled:bg-background-light disabled:text-opacity-10 hover:scale-105 transition-transform duration-150 ease-in-out disabled:pointer-events-none"
+                className="mt-4 bg-primary text-white font-medium whitespace-nowrap px-8 py-3 rounded-lg text-center disabled:bg-background-light disabled:text-opacity-10 md:hover:scale-105 transition-transform duration-150 ease-in-out disabled:pointer-events-none"
               >
                 Let’s go!
               </button>

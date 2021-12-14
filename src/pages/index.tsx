@@ -27,7 +27,9 @@ const Home: NextPage = () => {
   return (
     <div className="max-w-5xl w-full mx-auto">
       <div className="p-8 flex items-center justify-between">
-        <span className="font-semibold md:text-lg">Dreamteampie.nl</span>
+        <Link href="/">
+          <a className="font-semibold md:text-lg">Dreamteampie.nl</a>
+        </Link>
         <span className="font-medium md:text-lg text-white text-opacity-60">FoodReview</span>
       </div>
       <div className="p-8">
@@ -37,7 +39,7 @@ const Home: NextPage = () => {
               Er kan nu gestemd worden op het gerecht van {activeMeal.team.name}
             </p>
             <Link href="/compose-review">
-              <a className="w-full bg-primary flex md:inline-flex md:w-auto justify-center text-white font-medium whitespace-nowrap px-3 py-3 rounded-lg text-center disabled:bg-background-light disabled:text-opacity-10 hover:scale-105 transition-transform duration-150 ease-in-out">
+              <a className="w-full bg-primary flex md:inline-flex md:w-auto justify-center text-white font-medium whitespace-nowrap px-3 py-3 rounded-lg text-center disabled:bg-background-light disabled:text-opacity-10 md:hover:scale-105 transition-transform duration-150 ease-in-out">
                 Schrijf een review
               </a>
             </Link>
@@ -54,7 +56,7 @@ const Home: NextPage = () => {
               <div
                 onClick={() => onTeamClick(team.id)}
                 key={team.id}
-                className="bg-background-light select-none shadow-lg rounded-lg cursor-pointer hover:shadow-2xl hover:scale-105 transition-transform duration-150 ease-in-out"
+                className="bg-background-light select-none shadow-lg rounded-lg cursor-pointer md:hover:shadow-2xl md:hover:scale-105 transition-transform duration-150 ease-in-out"
               >
                 <div className="relative w-full h-64 rounded-t-lg overflow-hidden">
                   <Image src={imageUrl} alt="Meal" layout="fill" objectFit="cover" objectPosition="center" />

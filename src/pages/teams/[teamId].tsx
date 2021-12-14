@@ -7,6 +7,7 @@ import { supabase } from '../../utils/supabaseClient';
 import Avatar from 'boring-avatars';
 import { StarRating } from '../../components/StarRating';
 import { RatingWithTitle } from '../../components/RatingWithTitle';
+import Link from 'next/link';
 
 const fetchTeam = async (entity: string, id: string) => {
   const { data } = await supabase
@@ -48,7 +49,9 @@ const Team: NextPage = () => {
   return (
     <div className="max-w-5xl w-full mx-auto">
       <div className="p-8 flex items-center justify-between">
-        <span className="font-semibold md:text-lg">Dreamteampie.nl</span>
+        <Link href="/">
+          <a className="font-semibold md:text-lg">Dreamteampie.nl</a>
+        </Link>
         <span className="font-medium md:text-lg text-white text-opacity-60">FoodReview</span>
       </div>
       <div className="p-8">

@@ -31,7 +31,7 @@ export const ReviewStepName = ({ onSubmit }: ReviewStepNameProps) => {
       </div>
       <button
         onClick={handleSubmit}
-        className="mt-auto bg-primary text-white font-medium whitespace-nowrap px-3 py-3 rounded-lg text-center disabled:bg-background-light disabled:text-opacity-10 hover:scale-105 transition-transform duration-150 ease-in-out disabled:pointer-events-none"
+        className="mt-auto bg-primary text-white font-medium whitespace-nowrap px-3 py-3 rounded-lg text-center disabled:bg-background-light disabled:text-opacity-10 md:hover:scale-105 transition-transform duration-150 ease-in-out disabled:pointer-events-none"
         disabled={name.length === 0}
       >
         Noem me zo!
