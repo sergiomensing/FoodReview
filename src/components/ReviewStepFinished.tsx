@@ -39,6 +39,13 @@ export const ReviewStepFinished = ({ teamId }: { teamId: number }) => {
       <p className="mt-auto pb-8 text-white text-opacity-60 text-center">
         Als je de volgende ronde weer mag meestemmen zie ik je straks weer!
       </p>
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+      <a
+        href="/"
+        className="mt-auto bg-primary text-white font-medium whitespace-nowrap px-3 py-3 rounded-lg text-center md:hover:scale-105 transition-transform duration-150 ease-in-out disabled:pointer-events-none"
+      >
+        Naar homepagina
+      </a>
     </div>
   );
 };

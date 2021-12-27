@@ -2,9 +2,11 @@ import { ChangeEventHandler, useState } from 'react';
 
 export type ReviewStepReviewProps = {
   onSubmit: (review: string) => void;
+  title: string;
+  desc: string;
 };
 
-export const ReviewStepReview = ({ onSubmit }: ReviewStepReviewProps) => {
+export const ReviewStepReview = ({ onSubmit, title, desc }: ReviewStepReviewProps) => {
   const [review, setReview] = useState('');
 
   const onChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
@@ -17,10 +19,8 @@ export const ReviewStepReview = ({ onSubmit }: ReviewStepReviewProps) => {
 
   return (
     <div className="p-8 flex flex-col h-full">
-      <h1 className="font-semibold text-2xl">In een paar zinnen, wat vond je van het gerecht?</h1>
-      <p className="text-white text-opacity-60 mt-4">
-        Wat vond je goed? Wat vond je slecht? Wat zou je zelf anders doen?
-      </p>
+      <h1 className="font-semibold text-2xl">{title}</h1>
+      <p className="text-white text-opacity-60 mt-4">{desc}</p>
       <div className="mt-16">
         <textarea
           placeholder="Leef je uit..."

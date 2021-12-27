@@ -16,7 +16,7 @@ const fetchTeams = async (entity: string) => {
 
 const Home: NextPage = () => {
   const router = useRouter();
-  const { data: teams } = useSWR(['teams'], fetchTeams, { revalidateOnFocus: false });
+  const { data: teams } = useSWR(['teams'], fetchTeams, { revalidateOnFocus: true });
 
   const { activeMeal } = useActiveMeal();
 

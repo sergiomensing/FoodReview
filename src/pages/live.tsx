@@ -1,13 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { NextPage } from 'next';
 import Image from 'next/image';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import cn from 'classnames';
 import { RatingWithTitle } from '../components/RatingWithTitle';
 import { ReviewCard } from '../components/ReviewCard';
 import { Timer } from '../components/Timer';
 import useSound from 'use-sound';
-import { Meal, Review, ReviewRating } from '../types';
+import { Review, ReviewRating } from '../types';
 import { supabase } from '../utils/supabaseClient';
 import { ActiveMeal, useActiveMeal } from '../hooks/useActiveMeal';
 
@@ -30,16 +30,51 @@ const getCatagoryRatings = (reviews: Review[], category: string) => {
   return ratings.reduce((a, b) => a + b.rating, 0) / ratings.length;
 };
 
+type QueuedReview = Review & {
+  done: boolean;
+  msToWait: number;
+};
+
 const Live: NextPage = () => {
   const [_rating, _setRating] = useState([0, 0, 0, 0]);
   const [time, setTime] = useState(1800);
   const [playNegative] = useSound('/sounds/negative.wav');
   const [playPositive] = useSound('/sounds/positive.wav');
-
+  const [reviewQueue, setReviewQueue] = useState<QueuedReview[]>([]);
   const [activeReview, setActiveReview] = useState<Review | undefined>(undefined);
   const [roundDone, setRoundDone] = useState(false);
+  const reviewQueueTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  const addMockReview = () => {
+    const msToWait = Math.floor(Math.random() * 10000) + 5001;
+    setReviewQueue((r) => [
+      ...r,
+      {
+        id: msToWait,
+        review_ratings: [{ category: 'Flavor', rating: 4, id: 1, review_id: 4 }],
+        meal_id: 1,
+        name: 'Peter de vreter',
+        overall_rating: 4,
+        review: 'test',
+        user_id: 1,
+        done: false,
+        msToWait,
+      },
+    ]);
+  };
 
   const { activeMeal, loading, refresh } = useActiveMeal((review) => {
+    const msToWait = Math.floor(Math.random() * 10000) + 5001;
+    setReviewQueue((r) => [...r, { ...review, done: false, msToWait }]);
+  });
+
+  useEffect(() => {
+    setTime(1800);
+  }, [activeMeal?.id]);
+
+  const meal = activeMeal;
+
+  const onPlayReview = (review: QueuedReview) => {
     setActiveReview(review);
 
     if (review.overall_rating < 2.5) {
@@ -47,25 +82,27 @@ const Live: NextPage = () => {
     } else {
       playPositive();
     }
-  });
 
-  const [meal, setMeal] = useState<ActiveMeal | undefined>(undefined);
+    const wpm = 200;
+    const timeoutDuration = 5000 + (review.review.split('').length / wpm) * 3600;
+    const timeout = setTimeout(() => {
+      setActiveReview(undefined);
+      reviewQueueTimeout.current = undefined;
+      setReviewQueue((qi) => qi.map((r) => (r.id === review.id ? { ...r, done: true } : r)));
+    }, timeoutDuration);
+
+    return () => clearTimeout(timeout);
+  };
 
   useEffect(() => {
-    if (activeMeal) {
-      setMeal(activeMeal);
-    }
-  }, [activeMeal]);
+    const firstNotDoneReview = reviewQueue.filter((qi) => !qi.done).at(0);
 
-  useEffect(() => {
-    if (activeReview) {
-      const wpm = 200;
-      const timeoutDuration = 5000 + (activeReview.review.split('').length / wpm) * 3600;
-      console.log(timeoutDuration);
-      const timeout = setTimeout(() => setActiveReview(undefined), timeoutDuration);
-      return () => clearTimeout(timeout);
+    // Set a new timeout if there is a not done review and there is not a review in the queue at this moment
+    if (firstNotDoneReview && reviewQueueTimeout.current === undefined) {
+      reviewQueueTimeout.current = setTimeout(() => onPlayReview(firstNotDoneReview), firstNotDoneReview.msToWait);
     }
-  }, [activeReview]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(reviewQueue)]);
 
   const setRandom = useCallback(() => {
     _setRating((r) => r.map(() => getRandomRating()));
@@ -86,9 +123,22 @@ const Live: NextPage = () => {
     if (time === 0) setRoundDone(true);
   }, [time]);
 
+  if (loading) {
+    return (
+      <div className="w-screen h-screen grid place-items-center">
+        <p>Laden...</p>
+      </div>
+    );
+  }
+
   const currentMeal = meal;
 
-  if (!currentMeal) return null;
+  if (!currentMeal)
+    return (
+      <div className="w-screen h-screen grid place-items-center">
+        <p>Tot zo 👋</p>
+      </div>
+    );
 
   const rating =
     currentMeal.reviews.length === 0
@@ -121,7 +171,7 @@ const Live: NextPage = () => {
           <Timer time={time} />
         </div>
       </div>
-      <div className="w-1/2 relative h-screen">
+      <div className="w-1/2 relative h-screen" onClick={addMockReview}>
         {imageUrl && (
           <Image
             src={imageUrl}

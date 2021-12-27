@@ -19,7 +19,7 @@ export const ReviewStepName = ({ onSubmit }: ReviewStepNameProps) => {
     <div className="p-8 flex flex-col h-full">
       <h1 className="font-semibold text-2xl">Hoe mogen we je noemen?</h1>
       <p className="text-white text-opacity-60 mt-4">
-        Dit mag een verzinsel zijn, dan blijf je anoniem. Of je echt naam, doe ik niet moeilijk over.
+        Dit mag een verzinsel zijn, dan blijf je anoniem. Of gebruik lekker je eigen naam.
       </p>
       <div className="mt-16">
         <input

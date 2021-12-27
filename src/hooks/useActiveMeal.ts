@@ -3,13 +3,19 @@ import useSWR from 'swr';
 import { Meal, Team, Review, ReviewRating } from '../types';
 import { supabase } from '../utils/supabaseClient';
 
+type ApplicationSetting = {
+  id: number;
+  _key: string;
+  _value: string;
+};
+
 export type ActiveMeal = Omit<Meal, 'team_id'> & { team: Team } & { reviews: Review[] };
 
-const fetchActiveMeal = async (entity: string, id?: number): Promise<ActiveMeal | undefined> => {
+const fetchActiveMeal = async (id?: number): Promise<ActiveMeal | undefined> => {
   let _id = id;
   if (!_id) {
     const { data: activeMealSetting } = await supabase
-      .from<{ id: number; _key: string; _value: string }>('application_settings')
+      .from<ApplicationSetting>('application_settings')
       .select('*')
       .eq('_key', 'active_meal')
       .single();
@@ -45,21 +51,28 @@ const fetchActiveMeal = async (entity: string, id?: number): Promise<ActiveMeal 
 };
 
 export const useActiveMeal = (onNewReview?: (review: Review) => void) => {
-  const [activeMealId, setActiveMealId] = useState<number | undefined>(undefined);
   const [loading, setLoading] = useState(true);
-  const [index, setIndex] = useState(0);
+  const [activeMeal, setActiveMeal] = useState<ActiveMeal | undefined>(undefined);
 
-  const { data: activeMeal } = useSWR(['meals', activeMealId, index], fetchActiveMeal, {
-    onSuccess: () => setLoading(false),
-    revalidateOnFocus: false,
-  });
+  const load = async (id?: number) => {
+    setLoading(true);
+    setActiveMeal(undefined);
+    const data = await fetchActiveMeal(id);
+    setActiveMeal(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   useEffect(() => {
     const subscription = supabase
-      .from<{ id: number; _key: string; _value: string }>('application_settings')
+      .from<ApplicationSetting>('application_settings')
       .on('*', (payload) => {
         if (payload.table == 'application_settings' && payload.new._key === 'active_meal') {
-          setActiveMealId(payload.new._value.length === 0 ? undefined : parseInt(payload.new._value));
+          const id = parseInt(payload.new._value || '0') || undefined;
+          load(id);
         }
       })
       .subscribe();
@@ -85,7 +98,7 @@ export const useActiveMeal = (onNewReview?: (review: Review) => void) => {
   }, []);
 
   const refresh = () => {
-    setIndex((i) => i + 1);
+    load();
   };
 
   return { activeMeal, loading, refresh };
